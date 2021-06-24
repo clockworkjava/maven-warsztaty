@@ -12,6 +12,58 @@
 
   <name>server</name>
 
+  <profiles>
+    <profile>
+      <id>deploy-to-server</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+              <execution>
+                <id>server-copy</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <phase>install</phase>
+                <configuration>
+                  <target>
+                    <echo message="Coping to host..."></echo>
+                    <sshexec host="s2.mydevil.net" username="${env.S2_USER}" trust="true"
+                             password="${env.S2_PASS}" failonerror="true"
+                             command="rm -rf /usr/home/${env.S2_USER}/latest/"/>
+                    <sshexec host="s2.mydevil.net" username="${env.S2_USER}" trust="true"
+                             password="${env.S2_PASS}" failonerror="true"
+                             command="mkdir -p /usr/home/${env.S2_USER}/latest/"/>
+                    <scp trust="yes"
+                         file="target/server.jar"
+                         todir="${env.S2_USER}:${env.S2_PASS}@s2.mydevil.net:/usr/home/${env.S2_USER}/latest/server.jar"
+                    />
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant-jsch</artifactId>
+                <version>1.8.4</version>
+              </dependency>
+              <dependency>
+                <groupId>com.jcraft</groupId>
+                <artifactId>jsch</artifactId>
+                <version>0.1.53</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+
   <dependencies>
 
     <dependency>
@@ -45,47 +97,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.8</version>
-        <executions>
-          <execution>
-            <id>server-copy</id>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <phase>install</phase>
-            <configuration>
-              <target>
-                <echo message="Coping to host..."></echo>
-                <sshexec host="s2.mydevil.net" username="${env.S2_USER}" trust="true"
-                         password="${env.S2_PASS}" failonerror="true"
-                         command="rm -rf /usr/home/${env.S2_USER}/latest/"/>
-                <sshexec host="s2.mydevil.net" username="${env.S2_USER}" trust="true"
-                         password="${env.S2_PASS}" failonerror="true"
-                         command="mkdir -p /usr/home/${env.S2_USER}/latest/"/>
-                <scp trust="yes"
-                     file="target/server.jar"
-                     todir="${env.S2_USER}:${env.S2_PASS}@s2.mydevil.net:/usr/home/${env.S2_USER}/latest/server.jar"
-                />
-              </target>
-            </configuration>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant-jsch</artifactId>
-            <version>1.8.4</version>
-          </dependency>
-          <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-            <version>0.1.53</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>
