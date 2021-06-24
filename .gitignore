@@ -1,3 +1,6 @@
-maven-workshop/target
-maven-workshop/.idea
 */*.iml
+*/.idea
+*/target
+*/*/target
+*/*/*.iml
+*/*/.idea
